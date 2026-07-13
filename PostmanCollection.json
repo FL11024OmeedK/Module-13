@@ -1,0 +1,164 @@
+{
+  "info": {
+    "name": "Rocket Food Delivery — Module 13",
+    "description": "All REST API endpoints consumed by the Rocket Food Delivery customer mobile app (Module 13).\n\nHow to use:\n1. Make sure the Spring Boot server and the ngrok tunnel are running.\n2. If your ngrok URL changed, update the `base_url` collection variable (the only value that ever needs to change).\n3. Run 'POST Authenticate' first — a test script stores the JWT into the `token` variable automatically.\n4. Every other request already sends `Authorization: Bearer {{token}}` and has all parameters pre-set.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://copied-roast-spider.ngrok-free.dev"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "customer_id",
+      "value": "2"
+    },
+    {
+      "key": "restaurant_id",
+      "value": "2"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authenticate",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const json = pm.response.json();",
+              "if (json.accessToken) {",
+              "    pm.collectionVariables.set('token', json.accessToken);",
+              "}",
+              "pm.test('Login succeeded', () => {",
+              "    pm.expect(json.success).to.eql(true);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "auth": { "type": "noauth" },
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"email\": \"customer@gmail.com\",\n    \"password\": \"password\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/auth",
+          "host": ["{{base_url}}"],
+          "path": ["api", "auth"]
+        },
+        "description": "Authenticate with the seeded customer account. Returns a JWT (stored automatically into the `token` collection variable) plus user_id and customer_id."
+      }
+    },
+    {
+      "name": "Get All Restaurants",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/api/restaurants",
+          "host": ["{{base_url}}"],
+          "path": ["api", "restaurants"]
+        },
+        "description": "List every restaurant with its computed rating and price range. Used by the Restaurants page with no filters applied."
+      }
+    },
+    {
+      "name": "Get Restaurants Filtered (rating + price)",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/api/restaurants?rating=5&price_range=1",
+          "host": ["{{base_url}}"],
+          "path": ["api", "restaurants"],
+          "query": [
+            { "key": "rating", "value": "5" },
+            { "key": "price_range", "value": "1" }
+          ]
+        },
+        "description": "List restaurants filtered by rating (1–5) and/or price range (1–3). Either query parameter can be used alone."
+      }
+    },
+    {
+      "name": "Get Restaurant By Id",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/api/restaurants/{{restaurant_id}}",
+          "host": ["{{base_url}}"],
+          "path": ["api", "restaurants", "{{restaurant_id}}"]
+        },
+        "description": "Details for a single restaurant, including its rating."
+      }
+    },
+    {
+      "name": "Get Products By Restaurant",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/api/products?restaurant={{restaurant_id}}",
+          "host": ["{{base_url}}"],
+          "path": ["api", "products"],
+          "query": [
+            { "key": "restaurant", "value": "{{restaurant_id}}" }
+          ]
+        },
+        "description": "Menu products for one restaurant. Used by the Restaurant Menu page."
+      }
+    },
+    {
+      "name": "Get Orders By Customer",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/api/orders?type=customer&id={{customer_id}}",
+          "host": ["{{base_url}}"],
+          "path": ["api", "orders"],
+          "query": [
+            { "key": "type", "value": "customer" },
+            { "key": "id", "value": "{{customer_id}}" }
+          ]
+        },
+        "description": "Order history for the logged-in customer, with products, prices, status, and courier. Used by the Order History page and detail modal."
+      }
+    },
+    {
+      "name": "Create Order",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"restaurant_id\": 2,\n    \"customer_id\": 2,\n    \"products\": [\n        { \"id\": 6, \"quantity\": 2 },\n        { \"id\": 9, \"quantity\": 1 }\n    ]\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/orders",
+          "host": ["{{base_url}}"],
+          "path": ["api", "orders"]
+        },
+        "description": "Create a new order for the seeded customer at restaurant 2 (product ids 6 and 9 belong to that restaurant's seeded menu). Used by the Order Confirmation modal."
+      }
+    }
+  ]
+}
