@@ -29,14 +29,15 @@ wireframe.
   with a red circle-X icon and a failure message ("Your order was not
   processed successfully. Please try again.")
 - Closing and reopening the modal returns it to the initial (idle) state
+- On success, all item quantities reset to 0 (owner decision — beyond the
+  checklist, prevents accidentally re-ordering the same items), so the menu
+  behind the modal shows a fresh cart once it closes
 - The summary itself (names, quantities, prices, total) — already rendered by
   the shell — is formally owned by this feature's "Correct Details" and
   "Currency Format" requirements now
 
 ### Out of Scope
 
-- Resetting item quantities after a successful order — not required by the
-  checklist or shown in the wireframe; do not add it
 - Order history updates (the new order will naturally appear there via the
   API — `order-history-page` feature)
 - Retry limits, timeouts, offline queueing
@@ -72,7 +73,7 @@ wireframe.
 | File | Role |
 |---|---|
 | `app/customer/restaurant/[id].tsx` | modal upgraded from shell to full state machine |
-| `contexts/CartContext.tsx` | read-only source of quantities (no changes expected) |
+| `contexts/CartContext.tsx` | source of quantities; gains a `clearQuantities()` used on success |
 | `POST /api/orders` | back-end endpoint (no changes) |
 
 ## Data Used or Modified
@@ -120,6 +121,8 @@ wireframe.
       test by forcing a failure (e.g. temporarily stopping the backend or
       sending an invalid body via a temporary tweak)
 - [ ] Close + reopen the modal → idle state again
+- [ ] After a successful order, closing the modal shows the menu with all
+      quantities back at 0 (and Create Order disabled again)
 - [ ] Verified on-device (Expo Go) with the real backend + tunnel running
 
 ## Notes for the AI

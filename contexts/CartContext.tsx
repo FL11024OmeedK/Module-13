@@ -5,6 +5,7 @@ type CartContextValue = {
   setActiveRestaurant: (restaurantId: number) => void;
   increment: (productId: number) => void;
   decrement: (productId: number) => void;
+  clearQuantities: () => void;
 };
 
 const CartContext = createContext<CartContextValue | null>(null);
@@ -35,8 +36,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }));
   };
 
+  // Used after a successful order so the menu starts fresh.
+  const clearQuantities = () => setQuantities({});
+
   return (
-    <CartContext.Provider value={{ quantities, setActiveRestaurant, increment, decrement }}>
+    <CartContext.Provider
+      value={{ quantities, setActiveRestaurant, increment, decrement, clearQuantities }}>
       {children}
     </CartContext.Provider>
   );
