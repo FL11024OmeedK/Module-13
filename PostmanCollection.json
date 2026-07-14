@@ -150,14 +150,14 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n    \"restaurant_id\": 2,\n    \"customer_id\": 2,\n    \"products\": [\n        { \"id\": 6, \"quantity\": 2 },\n        { \"id\": 9, \"quantity\": 1 }\n    ]\n}"
+          "raw": "{\n    \"restaurant_id\": 2,\n    \"customer_id\": 2,\n    \"products\": [\n        { \"id\": 6, \"quantity\": 2 },\n        { \"id\": 9, \"quantity\": 1 }\n    ],\n    \"send_email\": false,\n    \"send_sms\": false\n}"
         },
         "url": {
           "raw": "{{base_url}}/api/orders",
           "host": ["{{base_url}}"],
           "path": ["api", "orders"]
         },
-        "description": "Create a new order for the seeded customer at restaurant 2 (product ids 6 and 9 belong to that restaurant's seeded menu). Used by the Order Confirmation modal."
+        "description": "Create a new order for the seeded customer at restaurant 2 (product ids 6 and 9 belong to that restaurant's seeded menu). Used by the Order Confirmation modal. The optional send_email / send_sms flags trigger the Notify.eu email and Twilio SMS notifications (extra miles) when the backend has those credentials configured — leave false otherwise."
       }
     }
   ]
