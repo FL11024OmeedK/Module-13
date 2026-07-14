@@ -64,7 +64,7 @@ Each feature gets its own `feature/*` branch: spec first, then implementation.
 3. `login-page.feature.md` — ✅ implemented (verified on-device)
 4. `restaurant-list-page.feature.md` — ✅ implemented (verified on-device)
 5. `restaurant-menu-page.feature.md` — ✅ implemented (verified on-device)
-6. `menu-modal-confirmation.feature.md`
+6. `menu-modal-confirmation.feature.md` — ✅ implemented (success path verified on-device; failure-state path not yet exercised on-device)
 7. `order-history-page.feature.md`
 8. `order-history-modal.feature.md`
 
