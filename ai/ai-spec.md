@@ -117,9 +117,15 @@ Colors — use these exact values, no others:
 | Warm Yellow | `#F0CB67` | Star ratings |
 | White | `#FFFFFF` | Cards, modal bodies, header/footer background |
 
-Fonts: **Oswald** (via `@expo-google-fonts/oswald`) for headings/section titles
-(NEARBY RESTAURANTS, RESTAURANT MENU, MY ORDERS — uppercase); platform default
-(Arial-equivalent) for body text. Overflowing content must scroll.
+Fonts (both bundled, so they render identically on iOS and Android):
+**Oswald_700Bold** (`@expo-google-fonts/oswald`) for headings/section titles
+(NEARBY RESTAURANTS, RESTAURANT MENU, MY ORDERS — uppercase); **Arimo**
+(`@expo-google-fonts/arimo`, the open Arial-equivalent, 400/700) for all body
+text, applied by default through `components/AppText.tsx` — always import
+`AppText as Text` instead of react-native's `Text`. Font loading in
+`app/_layout.tsx` is deliberately **non-blocking** (no `fontsLoaded` render
+gate — a stalled font fetch must not blank the app). Overflowing content must
+scroll.
 
 ## Tech Stack and Constraints
 
