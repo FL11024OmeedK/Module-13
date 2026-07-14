@@ -3,15 +3,9 @@ import { faChevronDown, faStar } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import {
-  Image,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { Image, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
+import { AppText as Text } from '@/components/AppText';
 import { COLORS } from '@/constants/colors';
 
 const RESTAURANT_IMAGES = [
@@ -178,7 +172,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontFamily: 'Oswald_700Bold',
     color: COLORS.darkCharcoal,
     marginBottom: 12,
     textTransform: 'uppercase',

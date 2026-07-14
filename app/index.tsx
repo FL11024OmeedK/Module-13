@@ -1,15 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import {
-  Image,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
+import { Image, Pressable, StyleSheet, TextInput, View } from 'react-native';
 
+import { AppText as Text } from '@/components/AppText';
 import { COLORS } from '@/constants/colors';
 
 export default function Login() {
@@ -114,6 +108,10 @@ const styles = StyleSheet.create({
   card: {
     width: '100%',
     maxWidth: 360,
+    borderWidth: 1,
+    borderColor: '#CCCCCC',
+    borderRadius: 6,
+    padding: 20,
   },
   title: {
     fontSize: 18,

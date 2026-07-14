@@ -3,16 +3,9 @@ import { faCircleCheck, faCircleXmark, faStar } from '@fortawesome/free-solid-sv
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import {
-  Image,
-  Modal,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { Image, Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
+import { AppText as Text } from '@/components/AppText';
 import { COLORS } from '@/constants/colors';
 import { useCart } from '@/contexts/CartContext';
 
@@ -114,6 +107,8 @@ export default function RestaurantMenu() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+      <Text style={styles.sectionTitle}>Restaurant Menu</Text>
+
       {restaurant && (
         <View style={styles.header}>
           <View style={styles.headerRow}>
@@ -237,6 +232,13 @@ const styles = StyleSheet.create({
   content: {
     padding: 16,
   },
+  sectionTitle: {
+    fontSize: 16,
+    fontFamily: 'Oswald_700Bold',
+    color: COLORS.darkCharcoal,
+    marginBottom: 12,
+    textTransform: 'uppercase',
+  },
   header: {
     marginBottom: 16,
   },
@@ -247,6 +249,8 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   restaurantName: {
+    flex: 1,
+    marginRight: 12,
     fontSize: 18,
     fontWeight: 'bold',
     color: COLORS.darkCharcoal,
@@ -261,6 +265,7 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   createOrderButton: {
+    flexShrink: 0,
     backgroundColor: COLORS.orangeRed,
     borderRadius: 4,
     paddingHorizontal: 14,
