@@ -24,6 +24,14 @@ export type Order = {
   created_on: string;
 };
 
+function formatDate(iso: string) {
+  return new Date(iso).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  });
+}
+
 export default function OrderHistory() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
@@ -83,8 +91,29 @@ export default function OrderHistory() {
                 <Text style={styles.modalClose}>✕</Text>
               </Pressable>
             </View>
-            {/* Detail body (date, status, courier, products, totals) is
-                implemented by the order-history-modal feature. */}
+
+            {selectedOrder && (
+              <View style={styles.modalBody}>
+                <Text style={styles.metaLine}>Order Date: {formatDate(selectedOrder.created_on)}</Text>
+                <Text style={styles.metaLine}>Status: {selectedOrder.status.toUpperCase()}</Text>
+                <Text style={styles.metaLine}>Courier: {selectedOrder.courier_name ?? ''}</Text>
+
+                <View style={styles.modalDivider} />
+
+                {selectedOrder.products.map((product) => (
+                  <View key={product.product_id} style={styles.productLine}>
+                    <Text style={styles.productName}>{product.product_name}</Text>
+                    <Text style={styles.productQty}>x{product.quantity}</Text>
+                    <Text style={styles.productPrice}>${product.total_cost.toFixed(2)}</Text>
+                  </View>
+                ))}
+
+                <View style={styles.totalRow}>
+                  <Text style={styles.totalLabel}>TOTAL:</Text>
+                  <Text style={styles.totalValue}>${selectedOrder.total_cost.toFixed(2)}</Text>
+                </View>
+              </View>
+            )}
           </View>
         </View>
       </Modal>
@@ -174,5 +203,57 @@ const styles = StyleSheet.create({
   modalClose: {
     color: COLORS.white,
     fontSize: 16,
+  },
+  modalBody: {
+    padding: 16,
+  },
+  metaLine: {
+    fontSize: 13,
+    color: COLORS.darkCharcoal,
+    marginBottom: 2,
+  },
+  modalDivider: {
+    height: 1,
+    backgroundColor: '#EEEEEE',
+    marginVertical: 12,
+  },
+  productLine: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 4,
+  },
+  productName: {
+    flex: 1,
+    color: COLORS.darkCharcoal,
+    fontSize: 13,
+  },
+  productQty: {
+    width: 40,
+    textAlign: 'right',
+    color: COLORS.darkCharcoal,
+    fontSize: 13,
+  },
+  productPrice: {
+    width: 80,
+    textAlign: 'right',
+    color: COLORS.darkCharcoal,
+    fontSize: 13,
+  },
+  totalRow: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    gap: 8,
+    marginTop: 12,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#EEEEEE',
+  },
+  totalLabel: {
+    fontWeight: 'bold',
+    color: COLORS.darkCharcoal,
+  },
+  totalValue: {
+    fontWeight: 'bold',
+    color: COLORS.darkCharcoal,
   },
 });

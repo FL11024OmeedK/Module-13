@@ -66,7 +66,7 @@ Each feature gets its own `feature/*` branch: spec first, then implementation.
 5. `restaurant-menu-page.feature.md` — ✅ implemented (verified on-device)
 6. `menu-modal-confirmation.feature.md` — ✅ implemented (success path verified on-device; failure-state path not yet exercised on-device)
 7. `order-history-page.feature.md` — ✅ implemented (verified on-device)
-8. `order-history-modal.feature.md`
+8. `order-history-modal.feature.md` — ✅ implemented (verified on-device)
 
 ## Screens / Routes (Expo Router file map)
 
