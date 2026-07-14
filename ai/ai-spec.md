@@ -57,7 +57,9 @@ Login → Browse Restaurants → Filter (optional) → Select Restaurant
 
 ## Feature Index (specs in ./ai/features/)
 
-1. `navigation-structure.feature.md`
+Each feature gets its own `feature/*` branch: spec first, then implementation.
+
+1. `navigation-structure.feature.md` — ✅ implemented (verified on-device)
 2. `header-footer.feature.md`
 3. `login-page.feature.md`
 4. `restaurant-list-page.feature.md`
@@ -126,6 +128,10 @@ Fonts: **Oswald** (via `@expo-google-fonts/oswald`) for headings/section titles
 - FontAwesome (`@fortawesome/react-native-fontawesome`) for icons
 - react-native-reanimated available; React Bootstrap installed to satisfy module
   constraints (web-oriented — native UI is built with core RN components)
+- ⚠️ **react-native-dotenv is installed but its babel plugin must NEVER be
+  configured** — it breaks Expo Router's route discovery (the app renders the
+  "no routes" onboarding screen). There must be no custom `babel.config.js`.
+  Env vars are read via Expo's built-in `EXPO_PUBLIC_*` inlining instead.
 - All restaurant menus use the same static image `assets/images/RestaurantMenu.jpg`;
   restaurant cards pick images from `assets/images/restaurants/`
 - Must run on **both iOS and Android** via Expo Go
@@ -162,9 +168,14 @@ Fonts: **Oswald** (via `@expo-google-fonts/oswald`) for headings/section titles
 1. Start MySQL, then the API:
    `SPRING_DATASOURCE_USERNAME=… SPRING_DATASOURCE_PASSWORD=… ./mvnw spring-boot:run`
 2. Start the tunnel: `ngrok http 8080` → put the URL in `.env` as `EXPO_PUBLIC_URL`
-3. `npx expo start` → scan QR with Expo Go (primary target is a physical phone)
+3. `npx expo start --tunnel` → scan QR with Expo Go (primary target is a
+   physical phone; `--tunnel` is required under WSL2 because Metro's LAN
+   address is unreachable from the phone)
 4. Verify with `npx tsc --noEmit` and the Postman collection
    (`PostmanCollection.json`) before committing.
+5. Verifying a feature means checking its **rendered output on a device (or the
+   served web page)** — a successful bundle/typecheck alone does not prove the
+   screen works.
 
 ## Definition of Done (project-wide)
 
