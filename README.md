@@ -48,6 +48,7 @@ The app is built from a bare Expo project and consumes the existing **Spring Boo
 - **Storage:** AsyncStorage (persists the JWT token)
 - **UI / Icons:** React Bootstrap, FontAwesome (`@fortawesome/react-native-fontawesome`)
 - **Animation:** react-native-reanimated
+- **Fonts:** bundled Oswald (section titles) and Arimo/Arial-equivalent (body text) via `@expo-google-fonts`, identical on iOS and Android
 - **Env config:** Expo's built-in `EXPO_PUBLIC_*` variable inlining (react-native-dotenv is installed per module constraints, but its babel plugin is not loaded — it breaks Expo Router's route discovery)
 - **Tunneling:** ngrok (v3)
 
