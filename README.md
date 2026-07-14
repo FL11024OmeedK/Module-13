@@ -28,7 +28,7 @@ Rocket Food Delivery is a food-ordering service. This repository contains its **
 
 The app is built from a bare Expo project and consumes the existing **Spring Boot REST API** from Module 12 (also included in this repository under `src/`). Because the API runs on a local machine, an **ngrok tunnel** exposes it so a physical phone can reach it.
 
-> **Status:** the mobile app is in active development. Project setup, dependencies, assets, and the API/tunnel connection are complete and verified; the navigation structure and feature screens (Login, Restaurants, Menu, Order History) are being built feature-branch by feature-branch.
+> **Status:** the mobile app is in active development. Project setup, dependencies, assets, the API/tunnel connection, and the three-level navigation structure (root Stack → customer Tabs → restaurant Stack) are complete and verified on-device; the feature screens (Login, Restaurants, Menu, Order History) are being built feature-branch by feature-branch, each with its own spec in `ai/features/`.
 
 ## Features
 
@@ -48,7 +48,7 @@ The app is built from a bare Expo project and consumes the existing **Spring Boo
 - **Storage:** AsyncStorage (persists the JWT token)
 - **UI / Icons:** React Bootstrap, FontAwesome (`@fortawesome/react-native-fontawesome`)
 - **Animation:** react-native-reanimated
-- **Env config:** Expo `EXPO_PUBLIC_*` variables + react-native-dotenv
+- **Env config:** Expo's built-in `EXPO_PUBLIC_*` variable inlining (react-native-dotenv is installed per module constraints, but its babel plugin is not loaded — it breaks Expo Router's route discovery)
 - **Tunneling:** ngrok (v3)
 
 **Back-end (consumed as-is from Module 12):**
@@ -63,14 +63,24 @@ The app is built from a bare Expo project and consumes the existing **Spring Boo
 Module13/
 ├── app/                  # Expo Router screens (file-based routes)
 │   ├── _layout.tsx       # Root Stack navigator
-│   └── index.tsx         # Login screen (entry route)
+│   ├── index.tsx         # Login screen (entry route)
+│   └── customer/
+│       ├── _layout.tsx   # Bottom Tabs (Restaurants, OrderHistory)
+│       ├── history.tsx   # Order history screen
+│       └── restaurant/
+│           ├── _layout.tsx   # Nested Stack (list ↔ menu)
+│           ├── index.tsx     # Restaurant list screen
+│           └── [id].tsx      # Restaurant menu screen
+├── ai/                   # AI specification documents
+│   ├── ai-spec.md        # Global AI spec (read first)
+│   └── features/         # One spec per feature
 ├── assets/
 │   └── images/
 │       ├── restaurants/  # Provided restaurant card images
 │       ├── RestaurantMenu.jpg  # Static image used by all menus
 │       └── AppLogoV*.png / AppIcon.png
 ├── components/           # Shared React Native components
-├── constants/            # App-wide constants (colors, etc.)
+├── constants/            # App-wide constants (colors.ts palette)
 ├── hooks/                # Custom React hooks
 ├── src/                  # Java Spring Boot REST API (Module 12)
 │   ├── main/java/com/rocketFoodDelivery/rocketFood/
@@ -79,9 +89,9 @@ Module13/
 │   │   └── security/         # JWT filter, SecurityConfig
 │   └── main/resources/application.properties
 ├── app.json              # Expo configuration
-├── babel.config.js       # Babel (react-native-dotenv plugin)
 ├── package.json          # Mobile app dependencies
 ├── pom.xml               # Back-end dependencies (Maven)
+├── PostmanCollection.json  # Pre-configured API requests
 └── .env.example          # Template for required env vars
 ```
 
@@ -141,10 +151,14 @@ Copy the public `https://….ngrok-free.dev` URL that ngrok prints.
 cp .env.example .env
 # Edit .env and set EXPO_PUBLIC_URL to your ngrok URL
 
-npx expo start
+npx expo start --tunnel
 ```
 
 Scan the QR code with Expo Go (Android) or the Camera app (iOS).
+
+> **Why `--tunnel`?** Under WSL2 (and some networks), Metro binds to an address
+> your phone can't reach. Tunnel mode serves the bundle through a public URL so
+> any device can connect. On a plain LAN setup, `npx expo start` alone may work.
 
 > **Note:** the free ngrok URL changes every time the tunnel restarts — update `.env` and restart Expo when it does.
 
