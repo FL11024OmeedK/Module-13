@@ -1,12 +1,13 @@
 import { Link } from 'expo-router';
 import { StyleSheet, Text, View } from 'react-native';
 
-export default function Login() {
+export default function Restaurants() {
   return (
     <View style={styles.container}>
-      <Text>login</Text>
-      {/* TEMP: remove when the real login flow exists (login-page feature) */}
-      <Link href="/customer/restaurant">Enter customer area</Link>
+      <Text>Restaurants</Text>
+      {/* TEMP: links to prove list → menu navigation until real cards exist */}
+      <Link href="/customer/restaurant/1">Restaurant 1</Link>
+      <Link href="/customer/restaurant/2">Restaurant 2</Link>
     </View>
   );
 }
