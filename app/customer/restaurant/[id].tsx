@@ -1,8 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { faStar } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { useFocusEffect, useLocalSearchParams } from 'expo-router';
-import { useCallback, useEffect, useState } from 'react';
+import { useLocalSearchParams } from 'expo-router';
+import { useEffect, useState } from 'react';
 import {
   Image,
   Modal,
@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 
 import { COLORS } from '@/constants/colors';
+import { useCart } from '@/contexts/CartContext';
 
 type RestaurantHeader = {
   name: string;
@@ -31,23 +32,17 @@ type Product = {
 
 export default function RestaurantMenu() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const restaurantId = Number(id);
+  const { quantities, setActiveRestaurant, increment, decrement } = useCart();
 
   const [restaurant, setRestaurant] = useState<RestaurantHeader | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
-  const [quantities, setQuantities] = useState<Record<number, number>>({});
   const [modalVisible, setModalVisible] = useState(false);
 
-  // Reset quantities every time this screen gains focus (first visit, a new
-  // restaurant, or navigating back to a previously-visited one). A plain
-  // useEffect keyed on `id` isn't enough: Expo Router's Stack can preserve a
-  // screen instance across navigation, so returning to an already-visited
-  // restaurant doesn't re-fire an id-only effect and can leave stale
-  // quantities in place.
-  useFocusEffect(
-    useCallback(() => {
-      setQuantities({});
-    }, [])
-  );
+  useEffect(() => {
+    setActiveRestaurant(restaurantId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [restaurantId]);
 
   useEffect(() => {
     const fetchMenu = async () => {
@@ -68,17 +63,6 @@ export default function RestaurantMenu() {
 
     fetchMenu();
   }, [id]);
-
-  const increment = (productId: number) => {
-    setQuantities((prev) => ({ ...prev, [productId]: (prev[productId] ?? 0) + 1 }));
-  };
-
-  const decrement = (productId: number) => {
-    setQuantities((prev) => ({
-      ...prev,
-      [productId]: Math.max(0, (prev[productId] ?? 0) - 1),
-    }));
-  };
 
   const hasAnyQuantity = Object.values(quantities).some((q) => q > 0);
 

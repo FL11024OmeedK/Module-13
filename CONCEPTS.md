@@ -17,40 +17,41 @@ List of three challenging concepts applied in this project.
 
 **🔤 Name:**
 
-Expo Router screen focus vs. component mount/unmount lifecycle
+Lifting state above a screen's mount/unmount lifecycle (React Context)
 
 **🎯 Purpose:**
 
-The Restaurant Menu screen must reset every item's quantity to 0 whenever
-the customer switches to a different restaurant (a graded requirement).
-The natural instinct is to rely on `useState`'s initial value resetting
-automatically whenever the screen "restarts" for a new restaurant.
+The Restaurant Menu screen must reset every item's quantity to 0 the
+moment the customer opens a different restaurant — quantities set on one
+restaurant must never leak into another one's menu.
 
 **❓ Why it was challenging:**
 
-My first implementation used `useEffect(() => setQuantities({}), [id])`,
-assuming that navigating to a different restaurant's menu (a different
-`[id]` route param) always causes React to fully unmount and remount the
-screen component, which would naturally reset local state anyway. That
-assumption is wrong for Expo Router (built on React Navigation): a Stack
-navigator can keep a previously-visited screen instance alive in memory
-so that going "back" to it restores scroll position and other UI state
-instead of rebuilding it from scratch. In that case, an effect keyed only
-on `id` does not re-fire when you return to a restaurant you'd already
-visited, since — from that specific screen instance's point of view — its
-`id` never changed. This meant quantities set on Restaurant A could
-silently survive a trip to Restaurant B and back, which is exactly the
-bug the requirement exists to prevent, and it would not have shown up in
-a quick test that only opened one new restaurant at a time. The fix was
-to switch from a mount-based effect to a focus-based one
-(`useFocusEffect`), which fires every time the screen becomes the active
-one on screen — covering first visits, new restaurants, and returning to
-an already-visited restaurant — regardless of whether the underlying
-component instance was actually recreated.
+My first attempt kept `quantities` as local `useState` inside the menu
+screen and reset it with `useEffect(() => setQuantities({}), [id])`,
+assuming a different restaurant id always means a fresh mount. Expo Router
+(built on React Navigation) doesn't guarantee that: a Stack can preserve a
+previously-visited screen, so the effect didn't reliably fire on return
+visits, and quantities from one restaurant could survive underneath
+another. Switching to `useFocusEffect` (reset on every focus, not just id
+change) closed that gap, but the deeper issue was that *local* component
+state is inherently destroyed whenever the screen unmounts — which
+happens on every back-navigation by default — so relying on effect timing
+inside the screen itself was always going to be fragile, regardless of
+which hook triggered the reset. The actual fix was to lift the quantities
+out of the screen entirely into a `CartContext` living above it, holding a
+single "active restaurant" id and its quantities. Whenever a menu screen
+requests a *different* restaurant than the one currently active, the
+context clears the quantities immediately as part of making the switch —
+so the reset is guaranteed by the context's own logic, independent of
+whatever Expo Router does with the screen's mount/unmount/focus lifecycle
+underneath it.
 
 **📍 Where (file & line):**
 
-`app/customer/restaurant/[id].tsx`, lines 40–47 (the `useFocusEffect` call)
+`contexts/CartContext.tsx` (the provider); used in
+`app/customer/restaurant/[id].tsx`, lines 36–37 (`useCart()` /
+`getQuantities`) and lines 63–64 (`increment`/`decrement`)
 
 ---
 
