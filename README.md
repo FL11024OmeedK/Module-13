@@ -116,6 +116,9 @@ npm install
 
 ### 2. Database
 
+Make sure MySQL is running first (it normally starts automatically with the
+system; if not: `sudo systemctl start mysql`).
+
 ```sql
 -- In a MySQL session:
 CREATE DATABASE IF NOT EXISTS rdelivery;
@@ -160,7 +163,7 @@ Scan the QR code with Expo Go (Android) or the Camera app (iOS).
 > your phone can't reach. Tunnel mode serves the bundle through a public URL so
 > any device can connect. On a plain LAN setup, `npx expo start` alone may work.
 
-> **Note:** the free ngrok URL changes every time the tunnel restarts — update `.env` and restart Expo when it does.
+> **Note:** the free ngrok URL changes every time the tunnel restarts. When it does, update **both** `.env` (`EXPO_PUBLIC_URL`) and the Postman collection's `base_url` variable, then **restart Metro** — `EXPO_PUBLIC_*` values are baked into the JS bundle at build time, so a running app won't pick up `.env` changes until Expo is restarted.
 
 **Seeded dev login** (created by the back-end seeder, for local development only):
 `customer@gmail.com` / `password`
