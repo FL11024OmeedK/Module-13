@@ -146,7 +146,15 @@ ngrok config add-authtoken <your-ngrok-authtoken>   # first time only
 ngrok http 8080
 ```
 
-Copy the public `https://….ngrok-free.dev` URL that ngrok prints.
+Copy the public `https://….ngrok-free.dev` URL that ngrok prints. Every
+authenticated free ngrok account gets one reserved **static domain**, so this
+URL stays the same across restarts — check
+[the ngrok dashboard](https://dashboard.ngrok.com/domains) for your assigned
+domain, and optionally pin it explicitly so it never depends on ngrok's
+default behavior:
+```bash
+ngrok http --domain=<your-static-domain>.ngrok-free.dev 8080
+```
 
 ### 5. Configure and start the mobile app
 
@@ -163,7 +171,7 @@ Scan the QR code with Expo Go (Android) or the Camera app (iOS).
 > your phone can't reach. Tunnel mode serves the bundle through a public URL so
 > any device can connect. On a plain LAN setup, `npx expo start` alone may work.
 
-> **Note:** the free ngrok URL changes every time the tunnel restarts. When it does, update **both** `.env` (`EXPO_PUBLIC_URL`) and the Postman collection's `base_url` variable, then **restart Metro** — `EXPO_PUBLIC_*` values are baked into the JS bundle at build time, so a running app won't pick up `.env` changes until Expo is restarted.
+> **Note:** with an authenticated ngrok account and a reserved static domain (see step 4), this URL stays the same across restarts — `.env` should only need updating once. If you ever use an *unauthenticated* or unclaimed ngrok session instead, the URL would rotate on every restart, requiring updates to both `.env` (`EXPO_PUBLIC_URL`) and the Postman collection's `base_url`, plus a Metro restart — `EXPO_PUBLIC_*` values are baked into the JS bundle at build time, so a running app won't pick up `.env` changes until Expo is restarted.
 
 **Seeded dev login** (created by the back-end seeder, for local development only):
 `customer@gmail.com` / `password`
