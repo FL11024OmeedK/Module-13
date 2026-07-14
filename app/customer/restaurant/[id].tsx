@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { faStar } from '@fortawesome/free-solid-svg-icons';
+import { faCircleCheck, faCircleXmark, faStar } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
@@ -33,11 +33,14 @@ type Product = {
 export default function RestaurantMenu() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const restaurantId = Number(id);
-  const { quantities, setActiveRestaurant, increment, decrement } = useCart();
+  const { quantities, setActiveRestaurant, increment, decrement, clearQuantities } = useCart();
 
   const [restaurant, setRestaurant] = useState<RestaurantHeader | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
+  const [orderState, setOrderState] = useState<'idle' | 'processing' | 'success' | 'error'>(
+    'idle'
+  );
 
   useEffect(() => {
     setActiveRestaurant(restaurantId);
@@ -71,6 +74,43 @@ export default function RestaurantMenu() {
     .map((p) => ({ ...p, quantity: quantities[p.id] }));
 
   const total = selectedItems.reduce((sum, item) => sum + item.cost * item.quantity, 0);
+
+  const confirmOrder = async () => {
+    setOrderState('processing');
+    try {
+      const [token, customerId] = await Promise.all([
+        AsyncStorage.getItem('accessToken'),
+        AsyncStorage.getItem('customer_id'),
+      ]);
+
+      const response = await fetch(`${process.env.EXPO_PUBLIC_URL}/api/orders`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          restaurant_id: restaurantId,
+          customer_id: Number(customerId),
+          products: selectedItems.map((item) => ({ id: item.id, quantity: item.quantity })),
+        }),
+      });
+
+      setOrderState(response.ok ? 'success' : 'error');
+    } catch {
+      setOrderState('error');
+    }
+  };
+
+  const closeModal = () => {
+    // The success summary is rendered from live quantities, so only clear
+    // them once the modal is dismissed — not the moment the order succeeds.
+    if (orderState === 'success') {
+      clearQuantities();
+    }
+    setModalVisible(false);
+    setOrderState('idle');
+  };
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
@@ -127,7 +167,7 @@ export default function RestaurantMenu() {
           <View style={styles.modalCard}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Order Confirmation</Text>
-              <Pressable onPress={() => setModalVisible(false)}>
+              <Pressable onPress={closeModal}>
                 <Text style={styles.modalClose}>✕</Text>
               </Pressable>
             </View>
@@ -147,6 +187,40 @@ export default function RestaurantMenu() {
             <View style={styles.modalTotalRow}>
               <Text style={styles.modalTotalLabel}>TOTAL:</Text>
               <Text style={styles.modalTotalValue}>${total.toFixed(2)}</Text>
+            </View>
+
+            <View style={styles.modalFooter}>
+              {orderState !== 'success' && (
+                <Pressable
+                  style={[
+                    styles.confirmButton,
+                    orderState === 'processing' && styles.confirmButtonDisabled,
+                  ]}
+                  disabled={orderState === 'processing'}
+                  onPress={confirmOrder}>
+                  <Text style={styles.confirmButtonText}>
+                    {orderState === 'processing' ? 'Processing Order...' : 'CONFIRM ORDER'}
+                  </Text>
+                </Pressable>
+              )}
+
+              {orderState === 'success' && (
+                <View style={styles.statusBlock}>
+                  <FontAwesomeIcon icon={faCircleCheck} color={COLORS.mutedGreen} size={28} />
+                  <Text style={styles.statusText}>
+                    Thank you!{'\n'}Your order has been received.
+                  </Text>
+                </View>
+              )}
+
+              {orderState === 'error' && (
+                <View style={styles.statusBlock}>
+                  <FontAwesomeIcon icon={faCircleXmark} color={COLORS.darkRed} size={28} />
+                  <Text style={styles.statusText}>
+                    Your order was not processed successfully.{'\n'}Please try again.
+                  </Text>
+                </View>
+              )}
             </View>
           </View>
         </View>
@@ -311,5 +385,32 @@ const styles = StyleSheet.create({
   modalTotalValue: {
     fontWeight: 'bold',
     color: COLORS.darkCharcoal,
+  },
+  modalFooter: {
+    padding: 16,
+    paddingTop: 4,
+  },
+  confirmButton: {
+    backgroundColor: COLORS.orangeRed,
+    borderRadius: 4,
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  confirmButtonDisabled: {
+    opacity: 0.6,
+  },
+  confirmButtonText: {
+    color: COLORS.white,
+    fontWeight: 'bold',
+  },
+  statusBlock: {
+    alignItems: 'center',
+    gap: 8,
+    paddingTop: 12,
+  },
+  statusText: {
+    textAlign: 'center',
+    color: COLORS.darkCharcoal,
+    fontSize: 13,
   },
 });
