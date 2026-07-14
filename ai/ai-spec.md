@@ -165,9 +165,13 @@ Fonts: **Oswald** (via `@expo-google-fonts/oswald`) for headings/section titles
 
 ## How to Run / Test
 
-1. Start MySQL, then the API:
+1. Ensure MySQL is running (`sudo systemctl start mysql` if needed), then start
+   the API:
    `SPRING_DATASOURCE_USERNAME=… SPRING_DATASOURCE_PASSWORD=… ./mvnw spring-boot:run`
-2. Start the tunnel: `ngrok http 8080` → put the URL in `.env` as `EXPO_PUBLIC_URL`
+2. Start the tunnel: `ngrok http 8080` → put the URL in `.env` as
+   `EXPO_PUBLIC_URL`. ⚠️ The free-tier URL changes on every restart — update
+   `.env` and the Postman collection's `base_url`, then restart Metro
+   (`EXPO_PUBLIC_*` values are baked into the bundle at build time).
 3. `npx expo start --tunnel` → scan QR with Expo Go (primary target is a
    physical phone; `--tunnel` is required under WSL2 because Metro's LAN
    address is unreachable from the phone)
