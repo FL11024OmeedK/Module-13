@@ -65,7 +65,7 @@ Each feature gets its own `feature/*` branch: spec first, then implementation.
 4. `restaurant-list-page.feature.md` — ✅ implemented (verified on-device)
 5. `restaurant-menu-page.feature.md` — ✅ implemented (verified on-device)
 6. `menu-modal-confirmation.feature.md` — ✅ implemented (success path verified on-device; failure-state path not yet exercised on-device)
-7. `order-history-page.feature.md`
+7. `order-history-page.feature.md` — ✅ implemented (verified on-device)
 8. `order-history-modal.feature.md`
 
 ## Screens / Routes (Expo Router file map)
@@ -190,6 +190,25 @@ Fonts: **Oswald** (via `@expo-google-fonts/oswald`) for headings/section titles
 6. Verifying a feature means checking its **rendered output on a device (or the
    served web page)** — a successful bundle/typecheck alone does not prove the
    screen works.
+7. ⚠️ **Do NOT run `npx expo export` while `npx expo start` is running.** They
+   share the same project's Metro cache / `.expo/` state, and running an export
+   against a live dev server can destabilize or kill the running Metro process.
+   Use `npx tsc --noEmit` for compile-level checks and the on-device render for
+   behavior — `expo export` is not needed for routine verification.
+
+### Tunnel operational notes (WSL2)
+
+- Two ngrok tunnels run at once and coexist fine: the **API tunnel**
+  (`~/.local/bin/ngrok http 8080`, config `~/.ngrok2/ngrok.yml`) and Metro's
+  **`--tunnel`** (via `@expo/ngrok`, config `~/.expo/ngrok.yml`). This is
+  expected — it is not a session-limit conflict.
+- If the Metro process dies but its tunnel agent lingers, restarting
+  `expo start --tunnel` fails with **`ERR_NGROK_334` ("endpoint already
+  online")**. Fix: kill the orphaned `@expo/ngrok .../ngrok start --none`
+  process **only** — never kill the `~/.local/bin/ngrok http 8080` API tunnel.
+- After killing a tunnel agent, a retry can briefly fail with **"session
+  closed"** while ngrok's cloud side releases the session. Wait ~60s and retry;
+  do not start editing ngrok config files in response to this.
 
 ## Definition of Done (project-wide)
 
