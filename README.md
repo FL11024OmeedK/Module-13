@@ -28,7 +28,7 @@ Rocket Food Delivery is a food-ordering service. This repository contains its **
 
 The app is built from a bare Expo project and consumes the existing **Spring Boot REST API** from Module 12 (also included in this repository under `src/`). Because the API runs on a local machine, an **ngrok tunnel** exposes it so a physical phone can reach it.
 
-> **Status:** the mobile app is in active development. Project setup, dependencies, assets, the API/tunnel connection, the three-level navigation structure (root Stack → customer Tabs → restaurant Stack), the shared header/footer, the Login page, and the Restaurant List page (with rating/price filters) are complete and verified on-device. The remaining feature screens (Menu, Order History) are being built feature-branch by feature-branch, each with its own spec in `ai/features/`.
+> **Status:** the mobile app is in active development. Project setup, dependencies, assets, the API/tunnel connection, the three-level navigation structure (root Stack → customer Tabs → restaurant Stack), the shared header/footer, the Login page, the Restaurant List page (with rating/price filters), and the Restaurant Menu page (quantity steppers + order summary modal shell) are complete and verified on-device. The remaining screens (order confirmation flow, Order History) are being built feature-branch by feature-branch, each with its own spec in `ai/features/`.
 
 ## Features
 

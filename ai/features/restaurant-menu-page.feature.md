@@ -129,16 +129,18 @@ open the Order Confirmation Modal when it's tapped — matching the wireframe.
 
 ## Notes for the AI
 
-- **Known trap:** Expo Router's Stack (nested under `customer/restaurant/`)
-  can preserve the previous screen's mounted state when navigating between
-  two routes matching the same `[id]` pattern — going from
-  `/customer/restaurant/2` to `/customer/restaurant/5` is not guaranteed to
-  fully unmount/remount the component just because the `id` param changed.
-  Do not rely on "it'll remount, so `useState`'s initial value handles the
-  reset" — that assumption can silently fail R2. Explicitly reset the
-  quantity map in a `useEffect` keyed on `id`
-  (`useEffect(() => setQuantities({}), [id])`), and verify this on-device by
-  actually switching restaurants and back, not just checking a single visit.
+- **Known trap (and how it was resolved):** Expo Router's Stack can preserve
+  a previously-visited screen instance, so neither "the component remounts,
+  `useState` resets itself" nor a `useEffect` keyed on `id` reliably enforces
+  R2, and a `useFocusEffect` reset fires in cases the requirement doesn't
+  ask about. The implemented solution lifts quantities out of the screen
+  into `contexts/CartContext.tsx`, which tracks a single **active
+  restaurant id**: when a menu screen calls `setActiveRestaurant(id)` with a
+  different id than the current one, the context clears all quantities as
+  part of the switch. The reset is therefore guaranteed by context logic,
+  independent of the screen's mount/unmount/focus lifecycle. Keep this
+  invariant if the cart is ever extended (e.g. by the
+  `menu-modal-confirmation` feature).
 - Reuse the header pattern from `Header.tsx` conceptually (logo bar), but
   this restaurant-name/price/rating block is a separate, page-specific
   element — not the same component.
