@@ -66,8 +66,10 @@ from the navigation-structure feature — this feature only adds the header.
 
 ## Tech Constraints
 
-- Logo image: `assets/images/AppLogoV1.png` (or V2 — pick the one that best
-  matches the wireframe's header lockup; do not create a new logo asset)
+- Logo image: `assets/images/AppLogoV1.png` — confirmed against the wireframe
+  (flame-swoosh mark only, no separate rocket-ship graphic, matching the header
+  in `Wireframe.pdf` exactly). Do NOT use `AppLogoV2.png` (adds a rocket-ship
+  icon not present in the wireframe) or create a new logo asset.
 - Log Out button color: Orange Red `#DA583B` (from `constants/colors.ts`),
   white text — matches the wireframe exactly
 - Navigate with `router.replace('/')` (not `push`) so Login isn't stackable
