@@ -199,11 +199,23 @@ EXPO_PUBLIC_URL=https://your-subdomain.ngrok-free.app
 DB_PASSWORD=your_rdelivery_app_mysql_password
 ```
 
+Optional (Twilio SMS / Notify.eu email extra miles) — also in `.env`, uncommented
+from `.env.example` when used. Spring's relaxed binding maps them to the
+`twilio.*` / `notify.*` properties (dashes removed):
+
+```env
+TWILIO_ACCOUNTSID=...   TWILIO_AUTHTOKEN=...   TWILIO_FROMNUMBER=...
+NOTIFY_CLIENTID=...     NOTIFY_SECRETKEY=...   NOTIFY_TEMPLATEID=...
+```
+
 All other back-end configuration lives in `src/main/resources/application.properties`.
 
-> ⚠️ Never commit real credentials. `.env` is gitignored, and the database
-> password is only ever read from it at launch by `start-backend.sh` — it is
-> never written into `application.properties` or typed on the command line.
+> ⚠️ Never commit real credentials — this applies to the database password
+> **and** the Twilio/Notify.eu secrets alike. `application.properties` keeps
+> placeholder values only; real secrets live in the gitignored `.env`, which
+> `start-backend.sh` sources at launch (or pass them inline as env vars, e.g.
+> `TWILIO_ACCOUNTSID=… ./start-backend.sh`). They are never written into
+> `application.properties` or committed in any form — including screenshots.
 
 ## API Documentation
 
