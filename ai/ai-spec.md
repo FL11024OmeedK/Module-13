@@ -164,6 +164,12 @@ scroll.
 6. All fetches go through `process.env.EXPO_PUBLIC_URL` with the Bearer token
    (except login). Never hardcode the tunnel URL.
 7. Never modify anything under `src/` (Java back-end) or commit credentials.
+   This covers ALL secrets — DB password, Twilio, Notify.eu:
+   `application.properties` keeps placeholders only; real values go in the
+   gitignored `.env` (sourced by `start-backend.sh`) or inline env vars
+   (e.g. `TWILIO_ACCOUNTSID=… ./start-backend.sh`). Spring relaxed binding
+   maps `twilio.account-sid` ← `TWILIO_ACCOUNTSID` (dashes removed).
+   Screenshots committed as proof must not show tokens/secret keys either.
 8. Follow the commit convention (`<type>(scope): summary`) and the branching
    model: `feature/*` from `dev`, merged back into `dev`. No direct commits to `main`.
 9. Never commit the submission summary document — it is submitted through the
