@@ -28,7 +28,7 @@ Rocket Food Delivery is a food-ordering service. This repository contains its **
 
 The app is built from a bare Expo project and consumes the existing **Spring Boot REST API** from Module 12 (also included in this repository under `src/`). Because the API runs on a local machine, an **ngrok tunnel** exposes it so a physical phone can reach it.
 
-> **Status:** the mobile app is in active development. Project setup, dependencies, assets, the API/tunnel connection, and the three-level navigation structure (root Stack → customer Tabs → restaurant Stack) are complete and verified on-device; the feature screens (Login, Restaurants, Menu, Order History) are being built feature-branch by feature-branch, each with its own spec in `ai/features/`.
+> **Status:** the mobile app is in active development. Project setup, dependencies, assets, the API/tunnel connection, the three-level navigation structure (root Stack → customer Tabs → restaurant Stack), the shared header/footer, and the Login page (JWT auth via the ngrok tunnel) are complete and verified on-device. The remaining feature screens (Restaurants, Menu, Order History) are being built feature-branch by feature-branch, each with its own spec in `ai/features/`.
 
 ## Features
 
@@ -79,7 +79,7 @@ Module13/
 │       ├── restaurants/  # Provided restaurant card images
 │       ├── RestaurantMenu.jpg  # Static image used by all menus
 │       └── AppLogoV*.png / AppIcon.png
-├── components/           # Shared React Native components
+├── components/           # Shared React Native components (Header, ...)
 ├── constants/            # App-wide constants (colors.ts palette)
 ├── hooks/                # Custom React hooks
 ├── src/                  # Java Spring Boot REST API (Module 12)
@@ -92,6 +92,8 @@ Module13/
 ├── package.json          # Mobile app dependencies
 ├── pom.xml               # Back-end dependencies (Maven)
 ├── PostmanCollection.json  # Pre-configured API requests
+├── start-backend.sh       # Starts the Spring Boot API using .env credentials
+├── check-services.sh      # Reports MySQL / backend / tunnel status
 └── .env.example          # Template for required env vars
 ```
 
@@ -129,15 +131,21 @@ FLUSH PRIVILEGES;
 
 ### 3. Start the back-end
 
-Credentials are passed as environment variables so they never live in a committed file:
-
 ```bash
-SPRING_DATASOURCE_USERNAME=rdelivery_app \
-SPRING_DATASOURCE_PASSWORD=<your-password> \
-./mvnw spring-boot:run
+cp .env.example .env
+# Edit .env: set DB_PASSWORD to the password you chose in step 2
+
+./start-backend.sh
 ```
 
-The API starts on `http://localhost:8080` and seeds the database on first run (seeding is skipped automatically if data already exists).
+`start-backend.sh` reads `DB_PASSWORD` from `.env` and passes it to Spring Boot
+as `SPRING_DATASOURCE_PASSWORD`, so the real password is never typed on the
+command line or written into `application.properties`. The API starts on
+`http://localhost:8080` and seeds the database on first run (seeding is
+skipped automatically if data already exists).
+
+At any point, run `./check-services.sh` to check whether MySQL, the backend,
+and the ngrok tunnel (step 4) are all up and actually reachable.
 
 ### 4. Start the ngrok tunnel
 
@@ -159,8 +167,7 @@ ngrok http --domain=<your-static-domain>.ngrok-free.dev 8080
 ### 5. Configure and start the mobile app
 
 ```bash
-cp .env.example .env
-# Edit .env and set EXPO_PUBLIC_URL to your ngrok URL
+# Edit .env (created in step 3) and set EXPO_PUBLIC_URL to your ngrok URL
 
 npx expo start --tunnel
 ```
@@ -178,23 +185,24 @@ Scan the QR code with Expo Go (Android) or the Camera app (iOS).
 
 ## Environment Variables
 
-Mobile app — set in `.env` at the project root (never committed; see `.env.example`):
+Both the mobile app and the back-end read from a single `.env` at the project
+root (never committed; see `.env.example` for the template):
 
 ```env
-# Public base URL of the back-end API (your ngrok tunnel)
+# Public base URL of the back-end API (your ngrok tunnel) — read by Expo
 EXPO_PUBLIC_URL=https://your-subdomain.ngrok-free.app
-```
 
-Back-end — passed on the command line when starting the server (see step 3 above):
-
-```env
-SPRING_DATASOURCE_USERNAME=rdelivery_app
-SPRING_DATASOURCE_PASSWORD=<your-password>
+# rdelivery_app MySQL password — read by start-backend.sh, passed to Spring
+# Boot as SPRING_DATASOURCE_PASSWORD (username is hardcoded to rdelivery_app
+# in the script, since that's the only local dev user this project uses)
+DB_PASSWORD=your_rdelivery_app_mysql_password
 ```
 
 All other back-end configuration lives in `src/main/resources/application.properties`.
 
-> ⚠️ Never commit real credentials. `.env` is gitignored, and database credentials are passed as environment variables at launch instead of being written into `application.properties`.
+> ⚠️ Never commit real credentials. `.env` is gitignored, and the database
+> password is only ever read from it at launch by `start-backend.sh` — it is
+> never written into `application.properties` or typed on the command line.
 
 ## API Documentation
 

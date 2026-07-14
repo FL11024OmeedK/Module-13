@@ -60,8 +60,8 @@ Login → Browse Restaurants → Filter (optional) → Select Restaurant
 Each feature gets its own `feature/*` branch: spec first, then implementation.
 
 1. `navigation-structure.feature.md` — ✅ implemented (verified on-device)
-2. `header-footer.feature.md`
-3. `login-page.feature.md`
+2. `header-footer.feature.md` — ✅ implemented (verified on-device)
+3. `login-page.feature.md` — ✅ implemented (verified on-device)
 4. `restaurant-list-page.feature.md`
 5. `restaurant-menu-page.feature.md`
 6. `menu-modal-confirmation.feature.md`
@@ -145,6 +145,8 @@ Fonts: **Oswald** (via `@expo-google-fonts/oswald`) for headings/section titles
 - `assets/images/` — provided images (`restaurants/`, `RestaurantMenu.jpg`, logos)
 - `ai/` — this spec + feature specs
 - `src/`, `pom.xml` — Module 12 Java API (do not modify)
+- `start-backend.sh` — starts the API using `DB_PASSWORD` from `.env`
+- `check-services.sh` — reports MySQL / backend / tunnel status in one shot
 
 ## Rules for the AI
 
@@ -165,21 +167,27 @@ Fonts: **Oswald** (via `@expo-google-fonts/oswald`) for headings/section titles
 
 ## How to Run / Test
 
-1. Ensure MySQL is running (`sudo systemctl start mysql` if needed), then start
-   the API:
-   `SPRING_DATASOURCE_USERNAME=… SPRING_DATASOURCE_PASSWORD=… ./mvnw spring-boot:run`
+1. Set `DB_PASSWORD` in `.env` (once), then start the API with
+   `./start-backend.sh` — it reads the password from `.env` and passes it to
+   Spring Boot, so it is never typed on the command line or hardcoded. Do
+   **not** run `./mvnw spring-boot:run` directly — without the env override it
+   silently falls back to the broken `root`/blank-password default in
+   `application.properties` and fails to start.
 2. Start the tunnel: `ngrok http 8080` → put the URL in `.env` as
    `EXPO_PUBLIC_URL`. With an authenticated account and its reserved static
-   domain, this URL is stable across restarts (see README step 4) — `.env`
-   should only need setting once. If the URL ever does change, update `.env`
-   and the Postman collection's `base_url`, then restart Metro
-   (`EXPO_PUBLIC_*` values are baked into the bundle at build time).
-3. `npx expo start --tunnel` → scan QR with Expo Go (primary target is a
+   domain, this URL is stable across restarts — `.env` should only need
+   setting once. If the URL ever does change, update `.env` and the Postman
+   collection's `base_url`, then restart Metro (`EXPO_PUBLIC_*` values are
+   baked into the bundle at build time).
+3. Run `./check-services.sh` at any point to confirm MySQL, the backend, and
+   the tunnel are all up and actually reachable (not just that the process
+   exists) before assuming a bug is in the app code.
+4. `npx expo start --tunnel` → scan QR with Expo Go (primary target is a
    physical phone; `--tunnel` is required under WSL2 because Metro's LAN
    address is unreachable from the phone)
-4. Verify with `npx tsc --noEmit` and the Postman collection
+5. Verify with `npx tsc --noEmit` and the Postman collection
    (`PostmanCollection.json`) before committing.
-5. Verifying a feature means checking its **rendered output on a device (or the
+6. Verifying a feature means checking its **rendered output on a device (or the
    served web page)** — a successful bundle/typecheck alone does not prove the
    screen works.
 
