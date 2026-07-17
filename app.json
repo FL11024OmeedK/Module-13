@@ -8,8 +8,11 @@
     "scheme": "rocketfooddelivery",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "jsEngine": "hermes",
+
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true, 
+      "jsEngine": "jsc"
     },
     "android": {
       "adaptiveIcon": {

@@ -5,6 +5,7 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 
+// The root layout in Expo Router (located at app/_layout.tsx) replaces the traditional App.js or App.tsx file as the global entry point. It is used to define global navigators, handle the splash screen, wrap the app in global context providers, and load global assets like custom fonts.
 export default function RootLayout() {
   // Load the bundled fonts, but never block rendering on them. Gating the whole
   // app on `fontsLoaded` risks a permanent blank screen if a font asset fetch
@@ -15,7 +16,7 @@ export default function RootLayout() {
 
   return (
     <>
-      <Stack screenOptions={{ headerShown: false }} />
+      <Stack screenOptions={{ headerShown: false }} /> 
       <StatusBar style="auto" />
     </>
   );

@@ -99,6 +99,7 @@ export default function Restaurants() {
           )}
         </View>
 
+
         <View style={styles.filterGroup}>
           <Text style={styles.filterLabel}>Price</Text>
           <Pressable

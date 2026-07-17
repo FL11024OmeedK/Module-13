@@ -14,12 +14,15 @@ import java.util.Optional;
 
 @RestController
 public class AddressApiController {
+    // SERVICE LAYER CONNECTION AND STORAGE: so that controller can call methods such as getAllAddressDTOs, getAddressDTOById, createAddress, updateAddress, and deleteAddressIfExists.
     private final AddressService addressService;
-
     public AddressApiController(AddressService addressService) {
         this.addressService = addressService;
     }
 
+    // GET ALL ADDRESSES: This request does not contain address data. The controller sends a request to the service here: addressService.getAllAddressDTOs()
+    // It receives the service result here: List<ApiAddressDTO> dtos 
+    // It returns that result to the client here: return ResponseBuilder.buildOkResponse(dtos);
     @GetMapping("/api/addresses")
     public ResponseEntity<Object> getAllAddresses() {
         List<ApiAddressDTO> dtos = addressService.getAllAddressDTOs();
