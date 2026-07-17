@@ -27,7 +27,6 @@ export default function RestaurantMenu() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const restaurantId = Number(id);
   const { quantities, setActiveRestaurant, increment, decrement, clearQuantities } = useCart();
-
   const [restaurant, setRestaurant] = useState<RestaurantHeader | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
@@ -44,24 +43,20 @@ export default function RestaurantMenu() {
     const fetchMenu = async () => {
       const token = await AsyncStorage.getItem('accessToken');
       const headers = { Authorization: `Bearer ${token}` };
-
       const [restaurantRes, productsRes] = await Promise.all([
         fetch(`${process.env.EXPO_PUBLIC_URL}/api/restaurants/${id}`, { headers }),
         fetch(`${process.env.EXPO_PUBLIC_URL}/api/products?restaurant=${id}`, { headers }),
       ]);
-
       const restaurantJson = await restaurantRes.json();
       const productsJson = await productsRes.json();
 
       setRestaurant(restaurantJson.data ?? null);
       setProducts(productsJson.data ?? []);
     };
-
     fetchMenu();
   }, [id]);
 
   const hasAnyQuantity = Object.values(quantities).some((q) => q > 0);
-
   const selectedItems = products
     .filter((p) => (quantities[p.id] ?? 0) > 0)
     .map((p) => ({ ...p, quantity: quantities[p.id] }));

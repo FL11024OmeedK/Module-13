@@ -28,7 +28,7 @@ Rocket Food Delivery is a food-ordering service. This repository contains its **
 
 The app is built from a bare Expo project and consumes the existing **Spring Boot REST API** from Module 12 (also included in this repository under `src/`). Because the API runs on a local machine, an **ngrok tunnel** exposes it so a physical phone can reach it.
 
-> **Status:** all eight feature screens are implemented and verified on-device — navigation, header/footer, Login, Restaurant List (with rating/price filters), Restaurant Menu, Order Confirmation modal (Processing/Success/Error), Order History table, and the Order History detail modal. Remaining before final submission: the confirmation modal's error-state path is implemented but not yet exercised on-device, and the full wireframe/color verification pass (see `ai/ai-spec.md`) should be run before merging `dev` → `main`.
+> **Status:** all eight feature screens are implemented and verified on-device — navigation, header/footer, Login, Restaurant List (with rating/price filters), Restaurant Menu, Order Confirmation modal (Processing/Success/Error), Order History table, and the Order History detail modal. The `dev` branch holds the final integration and is merged into `main` at submission time (only `main` is graded).
 
 ## Features
 
@@ -46,7 +46,7 @@ The app is built from a bare Expo project and consumes the existing **Spring Boo
 - **Language:** TypeScript
 - **Navigation:** Expo Router 6 (file-based routing; React Navigation under the hood)
 - **Storage:** AsyncStorage (persists the JWT token)
-- **UI / Icons:** React Bootstrap, FontAwesome (`@fortawesome/react-native-fontawesome`)
+- **UI / Icons:** FontAwesome (`@fortawesome/react-native-fontawesome`) for icons; layout uses core React Native primitives (React Bootstrap is installed to satisfy the module dependency requirement but not used for the UI)
 - **Animation:** react-native-reanimated
 - **Fonts:** bundled Oswald (section titles) and Arimo/Arial-equivalent (body text) via `@expo-google-fonts`, identical on iOS and Android
 - **Env config:** Expo's built-in `EXPO_PUBLIC_*` variable inlining (react-native-dotenv is installed per module constraints, but its babel plugin is not loaded — it breaks Expo Router's route discovery)
@@ -82,13 +82,15 @@ Module13/
 │       └── AppLogoV*.png / AppIcon.png
 ├── components/           # Shared React Native components (Header, ...)
 ├── constants/            # App-wide constants (colors.ts palette)
-├── hooks/                # Custom React hooks
+├── contexts/             # React Context providers (CartContext — order-quantity state)
 ├── src/                  # Java Spring Boot REST API (Module 12)
 │   ├── main/java/com/rocketFoodDelivery/rocketFood/
 │   │   ├── controller/api/   # REST controllers
 │   │   ├── models/ repository/ service/ dtos/
 │   │   └── security/         # JWT filter, SecurityConfig
 │   └── main/resources/application.properties
+├── LeetCode-Challenges/  # SQL challenge solution screenshots (deliverable)
+├── screenshots/          # Extra-mile proof (Twilio, Notify.eu accounts)
 ├── app.json              # Expo configuration
 ├── package.json          # Mobile app dependencies
 ├── pom.xml               # Back-end dependencies (Maven)
