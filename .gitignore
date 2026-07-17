@@ -34,3 +34,30 @@ build/
 
 ### Folders and Files ###
 /Requirements
+/demo
+/LeetCode-Challenges/LEETCODE-DEMO-SCRIPT.md
+
+### Node / Expo ###
+node_modules/
+.expo/
+web-build/
+dist/
+expo-env.d.ts
+app-example
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+.metro-health-check*
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+*.pem
+.env
+.env*.local
+*.tsbuildinfo
+/ios
+/android

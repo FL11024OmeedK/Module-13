@@ -1,161 +1,258 @@
-# Full-Stack-Development-1
-LinkedIn Profile: https://www.linkedin.com/in/omeedkashef/
-LinkedIn Update:
+# Rocket Food Delivery — Customer Mobile App
 
-> Replace "Project Title" with your actual project name
->
-> �� Important: Delete all placeholder text marked with > (including this line) and replace it with your own readme content.
+Cross-platform mobile app (React Native + Expo) for the Rocket Food Delivery service, built as Module 13 of the CodeBoxx Full-Stack Development Program.
 
 ## Table of Contents
 
-> (Optional - useful for longer READMEs)
->
-> Auto-generate or manually list main sections
->
-> ```markdown
-> - [Project Description](#project-description-the-why)
-> - [Installation](#installation--setup)
-> - [Usage](#usage--examples)
-> - [License](#license)
-> ```
+- [Project Description](#project-description)
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Project Structure](#project-structure)
+- [Prerequisites](#prerequisites)
+- [Installation / Setup](#installation--setup)
+- [Environment Variables](#environment-variables)
+- [API Documentation](#api-documentation)
+- [Tests](#tests)
+- [Author](#author)
+- [License](#license)
 
 ## Project Description
 
-> A short paragraph explaining:
->
-> - What the project does
-> - Who it's for
-> - What problem it solves
->
-> �� This should be readable by non-developers too.
->
-> **Example:**
-> TaskMaster is a productivity tool that helps freelancers and small teams track their daily tasks without the complexity of enterprise project management software. It solves the problem of task overload by providing a simple, distraction-free interface for managing priorities.
+Rocket Food Delivery is a food-ordering service. This repository contains its **customer-facing mobile application**, which lets customers:
+
+1. Log in to their account (JWT authentication)
+2. Browse restaurants and filter them by rating and price range
+3. View a restaurant's menu and select item quantities
+4. Place orders and receive success/failure confirmation
+5. Review their order history with full details
+
+The app is built from a bare Expo project and consumes the existing **Spring Boot REST API** from Module 12 (also included in this repository under `src/`). Because the API runs on a local machine, an **ngrok tunnel** exposes it so a physical phone can reach it.
+
+> **Status:** all eight feature screens are implemented and verified on-device — navigation, header/footer, Login, Restaurant List (with rating/price filters), Restaurant Menu, Order Confirmation modal (Processing/Success/Error), Order History table, and the Order History detail modal. The `dev` branch holds the final integration and is merged into `main` at submission time (only `main` is graded).
+
+## Features
+
+- 🔐 JWT login with credentials persisted via AsyncStorage
+- 🍽️ Restaurant browsing with rating and price-range filters
+- 🧾 Restaurant menus with stepper-controlled item quantities
+- 📦 Order creation with a confirmation modal and success/failure feedback
+- 📜 Order history with a full-detail modal (products, prices, status, courier)
+- 📱 Runs on both iOS and Android through Expo
 
 ## Tech Stack
 
-> List all major technologies used in your project.
->
-> Include: Frontend, Backend, Database, DevOps tools, Testing frameworks, etc.
->
-> **Remove this block and the example below before filling in your actual tech stack.**
->
-> **Example:**
-> - **Frontend:** React 18, TypeScript, Tailwind CSS
-> - **Backend:** Node.js, Express, PostgreSQL
-> - **DevOps:** Docker, GitHub Actions, AWS
-> - **Testing:** Jest, React Testing Library
+**Mobile app (this module):**
+- **Framework:** React Native 0.81 + Expo SDK 54
+- **Language:** TypeScript
+- **Navigation:** Expo Router 6 (file-based routing; React Navigation under the hood)
+- **Storage:** AsyncStorage (persists the JWT token)
+- **UI / Icons:** FontAwesome (`@fortawesome/react-native-fontawesome`) for icons; layout uses core React Native primitives (React Bootstrap is installed to satisfy the module dependency requirement but not used for the UI)
+- **Animation:** react-native-reanimated
+- **Fonts:** bundled Oswald (section titles) and Arimo/Arial-equivalent (body text) via `@expo-google-fonts`, identical on iOS and Android
+- **Env config:** Expo's built-in `EXPO_PUBLIC_*` variable inlining (react-native-dotenv is installed per module constraints, but its babel plugin is not loaded — it breaks Expo Router's route discovery)
+- **Tunneling:** ngrok (v3)
+
+**Back-end (consumed as-is from Module 12):**
+- **Language/Framework:** Java 17, Spring Boot 3.5
+- **Security:** Spring Security + JWT
+- **Database:** MySQL 8 (Spring Data JPA / Hibernate)
+- **Build:** Maven (wrapper included)
 
 ## Project Structure
 
-> Display your actual project's file and folder organization.
->
-> This helps newcomers understand where to find specific code.
->
-> **Remove this block and the example below before filling in your actual structure.**
->
-> **Example:**
-> ```
-> project-root/
-> ├── src/
-> │   ├── components/    # React components
-> │   ├── pages/         # Page components
-> │   ├── utils/         # Utility functions
-> │   ├── hooks/         # Custom React hooks
-> │   └── styles/        # CSS/styling files
-> ├── public/            # Static assets
-> ├── tests/             # Test files
-> ├── docs/              # Documentation
-> └── package.json
-> ```
+```
+Module13/
+├── app/                  # Expo Router screens (file-based routes)
+│   ├── _layout.tsx       # Root Stack navigator
+│   ├── index.tsx         # Login screen (entry route)
+│   └── customer/
+│       ├── _layout.tsx   # Bottom Tabs (Restaurants, OrderHistory)
+│       ├── history.tsx   # Order history screen
+│       └── restaurant/
+│           ├── _layout.tsx   # Nested Stack (list ↔ menu)
+│           ├── index.tsx     # Restaurant list screen
+│           └── [id].tsx      # Restaurant menu screen
+├── ai/                   # AI specification documents
+│   ├── ai-spec.md        # Global AI spec (read first)
+│   └── features/         # One spec per feature
+├── assets/
+│   └── images/
+│       ├── restaurants/  # Provided restaurant card images
+│       ├── RestaurantMenu.jpg  # Static image used by all menus
+│       └── AppLogoV*.png / AppIcon.png
+├── components/           # Shared React Native components (Header, ...)
+├── constants/            # App-wide constants (colors.ts palette)
+├── contexts/             # React Context providers (CartContext — order-quantity state)
+├── src/                  # Java Spring Boot REST API (Module 12)
+│   ├── main/java/com/rocketFoodDelivery/rocketFood/
+│   │   ├── controller/api/   # REST controllers
+│   │   ├── models/ repository/ service/ dtos/
+│   │   └── security/         # JWT filter, SecurityConfig
+│   └── main/resources/application.properties
+├── LeetCode-Challenges/  # SQL challenge solution screenshots (deliverable)
+├── screenshots/          # Extra-mile proof (Twilio, Notify.eu accounts)
+├── app.json              # Expo configuration
+├── package.json          # Mobile app dependencies
+├── pom.xml               # Back-end dependencies (Maven)
+├── PostmanCollection.json  # Pre-configured API requests
+├── start-backend.sh       # Starts the Spring Boot API using .env credentials
+├── check-services.sh      # Reports MySQL / backend / tunnel status
+└── .env.example          # Template for required env vars
+```
+
+## Prerequisites
+
+- Node.js 20+ ([Download](https://nodejs.org/))
+- Java 17+ ([Download via SDKMAN](https://sdkman.io/) or [Adoptium](https://adoptium.net/))
+- MySQL 8+ ([Download](https://dev.mysql.com/downloads/))
+- Git ([Download](https://git-scm.com/downloads))
+- [ngrok](https://ngrok.com/) account (free tier) — exposes the local server to your phone
+- **Expo Go** app on your phone ([Android](https://play.google.com/store/apps/details?id=host.exp.exponent) / [iOS](https://apps.apple.com/app/expo-go/id982107779))
 
 ## Installation / Setup
 
-> Provide clear, step-by-step instructions to run your project locally.
->
-> �� Assume the reader knows nothing about your setup.
->
-> Include: cloning, dependencies installation, environment setup, and how to start the app.
->
-> **Remove this block and the example below before filling in your actual installation steps.**
->
-> **Example:**
-> ```bash
-> # Clone the repository
-> git clone https://github.com/username/project-name.git
->
-> # Navigate to project directory
-> cd project-name
->
-> # Install dependencies
-> npm install
->
-> # Set up environment variables
-> cp .env.example .env
->
-> # Run the development server
-> npm run dev
-> ```
->
-> The application will be available at `http://localhost:3000`
+### 1. Clone and install
+
+```bash
+git clone git@github.com:FL11024OmeedK/Module-13.git
+cd Module-13
+npm install
+```
+
+### 2. Database
+
+Make sure MySQL is running first (it normally starts automatically with the
+system; if not: `sudo systemctl start mysql`).
+
+```sql
+-- In a MySQL session:
+CREATE DATABASE IF NOT EXISTS rdelivery;
+CREATE USER 'rdelivery_app'@'localhost' IDENTIFIED BY '<your-password>';
+GRANT ALL PRIVILEGES ON rdelivery.* TO 'rdelivery_app'@'localhost';
+FLUSH PRIVILEGES;
+```
+
+### 3. Start the back-end
+
+```bash
+cp .env.example .env
+# Edit .env: set DB_PASSWORD to the password you chose in step 2
+
+./start-backend.sh
+```
+
+`start-backend.sh` reads `DB_PASSWORD` from `.env` and passes it to Spring Boot
+as `SPRING_DATASOURCE_PASSWORD`, so the real password is never typed on the
+command line or written into `application.properties`. The API starts on
+`http://localhost:8080` and seeds the database on first run (seeding is
+skipped automatically if data already exists).
+
+At any point, run `./check-services.sh` to check whether MySQL, the backend,
+and the ngrok tunnel (step 4) are all up and actually reachable.
+
+### 4. Start the ngrok tunnel
+
+```bash
+ngrok config add-authtoken <your-ngrok-authtoken>   # first time only
+ngrok http 8080
+```
+
+Copy the public `https://….ngrok-free.dev` URL that ngrok prints. Every
+authenticated free ngrok account gets one reserved **static domain**, so this
+URL stays the same across restarts — check
+[the ngrok dashboard](https://dashboard.ngrok.com/domains) for your assigned
+domain, and optionally pin it explicitly so it never depends on ngrok's
+default behavior:
+```bash
+ngrok http --domain=<your-static-domain>.ngrok-free.dev 8080
+```
+
+### 5. Configure and start the mobile app
+
+```bash
+# Edit .env (created in step 3) and set EXPO_PUBLIC_URL to your ngrok URL
+
+npx expo start --tunnel
+```
+
+Scan the QR code with Expo Go (Android) or the Camera app (iOS).
+
+> **Why `--tunnel`?** Under WSL2 (and some networks), Metro binds to an address
+> your phone can't reach. Tunnel mode serves the bundle through a public URL so
+> any device can connect. On a plain LAN setup, `npx expo start` alone may work.
+
+> **Note:** with an authenticated ngrok account and a reserved static domain (see step 4), this URL stays the same across restarts — `.env` should only need updating once. If you ever use an *unauthenticated* or unclaimed ngrok session instead, the URL would rotate on every restart, requiring updates to both `.env` (`EXPO_PUBLIC_URL`) and the Postman collection's `base_url`, plus a Metro restart — `EXPO_PUBLIC_*` values are baked into the JS bundle at build time, so a running app won't pick up `.env` changes until Expo is restarted.
+
+**Seeded dev login** (created by the back-end seeder, for local development only):
+`customer@gmail.com` / `password`
 
 ## Environment Variables
 
-> List ALL environment variables required for your project.
->
-> Include descriptions for each variable so users know what values to provide.
->
-> **If your project doesn't use environment variables, you can remove this entire section.**
->
-> **Remove this block and the example below before filling in your actual variables.**
->
-> **Example:**
-> ```env
-> # Database
-> DATABASE_URL=your_database_url
->
-> # API Keys
-> API_KEY=your_api_key
-> JWT_SECRET=your_jwt_secret
->
-> # Application
-> PORT=3000
-> NODE_ENV=development
-> ```
->
-> Create a `.env` file in the root directory and add these variables with your actual values.
+Both the mobile app and the back-end read from a single `.env` at the project
+root (never committed; see `.env.example` for the template):
+
+```env
+# Public base URL of the back-end API (your ngrok tunnel) — read by Expo
+EXPO_PUBLIC_URL=https://your-subdomain.ngrok-free.app
+
+# rdelivery_app MySQL password — read by start-backend.sh, passed to Spring
+# Boot as SPRING_DATASOURCE_PASSWORD (username is hardcoded to rdelivery_app
+# in the script, since that's the only local dev user this project uses)
+DB_PASSWORD=your_rdelivery_app_mysql_password
+```
+
+Optional (Twilio SMS / Notify.eu email extra miles) — also in `.env`, uncommented
+from `.env.example` when used. Spring's relaxed binding maps them to the
+`twilio.*` / `notify.*` properties (dashes removed):
+
+```env
+TWILIO_ACCOUNTSID=...   TWILIO_AUTHTOKEN=...   TWILIO_FROMNUMBER=...
+NOTIFY_CLIENTID=...     NOTIFY_SECRETKEY=...   NOTIFY_TEMPLATEID=...
+```
+
+All other back-end configuration lives in `src/main/resources/application.properties`.
+
+> ⚠️ Never commit real credentials — this applies to the database password
+> **and** the Twilio/Notify.eu secrets alike. `application.properties` keeps
+> placeholder values only; real secrets live in the gitignored `.env`, which
+> `start-backend.sh` sources at launch (or pass them inline as env vars, e.g.
+> `TWILIO_ACCOUNTSID=… ./start-backend.sh`). They are never written into
+> `application.properties` or committed in any form — including screenshots.
 
 ## API Documentation
 
-> (If applicable)
->
-> Brief overview of main endpoints/functions or link to full API docs.
->
-> **Example:**
-> ### Endpoints
-> ```
-> GET    /api/tasks          - Get all tasks
-> POST   /api/tasks          - Create a new task
-> GET    /api/tasks/:id      - Get task by ID
-> PUT    /api/tasks/:id      - Update task
-> DELETE /api/tasks/:id      - Delete task
-> ```
->
-> �� [Full API Documentation](docs/API.md)
+The mobile app authenticates once, stores the JWT in AsyncStorage, and sends it as a `Authorization: Bearer <token>` header on every request. All `/api/**` routes except `/api/auth` require the token.
 
-## Author / Contributors
+Endpoints used by the mobile app:
 
-> Add your information and links to your professional profiles.
->
-> This is especially important for portfolio and student projects.
->
-> **Remove this block and replace the example below with your actual information.**
->
-> **Your Name** - [@github-username](https://github.com/username)
-> - Portfolio: [yourportfolio.com](https://yourportfolio.com)
-> - LinkedIn: [linkedin.com/in/yourname](https://linkedin.com/in/yourname)
-> - Email: your.email@example.com
->
-> **Contributors:**
-> - [@contributor1](https://github.com/contributor1) - Feature X
-> - [@contributor2](https://github.com/contributor2) - Bug fixes
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/api/auth` | Authenticate (email + password) → JWT, user/customer ids |
+| `GET` | `/api/restaurants` | List restaurants; optional `?rating=` and `?price_range=` filters |
+| `GET` | `/api/restaurants/{id}` | Restaurant details with rating |
+| `GET` | `/api/products` | List menu products |
+| `GET` | `/api/orders` | List orders (by customer) |
+| `POST` | `/api/orders` | Create a new order |
+
+The full API also exposes CRUD endpoints for users, customers, couriers, employees, addresses, product-orders, and order/courier statuses. A Postman collection covering all module endpoints is available at [`PostmanCollection.json`](PostmanCollection.json) in the project root — run its *Authenticate* request first (the JWT is captured into a collection variable automatically).
+
+## Tests
+
+**Back-end** — integration tests cover every API controller (`Auth`, `Restaurant`, `Order`, `Product`, `Courier`, `Customer`, `Employee`, `User`, `Address`, `OrderStatus`, `CourierStatus`, `ProductOrder`):
+
+```bash
+./mvnw test
+```
+
+**Mobile app** — no automated test suite exists yet for this module; screens are verified manually on-device against the provided wireframes and through the Postman collection.
+
+## Author
+
+**Omeed Kashef**
+- GitHub: [@FL11024OmeedK](https://github.com/FL11024OmeedK)
+- LinkedIn: [linkedin.com/in/omeedkashef](https://www.linkedin.com/in/omeedkashef/)
+- Email: omeedkashef@gmail.com
+
+## License
+
+Educational project built for the CodeBoxx Full-Stack Development Program (Module 13). Not licensed for redistribution.
